@@ -48,14 +48,14 @@ band-energy drum classification and grid quantization (see
 
 ## Continuation
 
-`song_extended.mid` continues the piece from bar 16 (where the recording cuts
-off mid-bar) with a 10-bar self-sampled coda (`continue_song.py`): the chord
-cycle (A♭ → D♭ → Fm → B♭m → Fm → G♭ → Fm → B♭m → E♭m) is derived from per-bar
-analysis, each new bar borrows phrases from source bars with the same chord
-(velocity-shaped, ±8 ms jitter), and the arc eases down to a sustained B♭ minor
-resolution (~53 s total). Continuation vs source: chroma profile correlation
-0.926, identical tempo, 144/144 notes in key, gently softer dynamics.
-Preview: `song_extended_preview.mp3`.
+`song_extended.mid` (~61 s): the recording cuts off mid-bar exactly as its
+15-bar cycle (A♭ → D♭ → Fm → B♭m → Fm → G♭ → Fm → B♭m → E♭m) returns to its
+A♭ downbeat, so the continuation block-copies bars 1–15 onto the seam as one
+piece (`continue_song.py`) — every phrase and drum pattern in its original
+relationship, at the original energy (per-bar note density identical, RMS
+within 2 %, envelope corr 0.81, chroma similarity 0.972) — with only ±3
+velocity / ±6 ms humanization, closing on a sustained B♭ minor bar with a
+kick-and-crash. Preview: `song_extended_preview.mp3`.
 
 ## Validation (rendered MIDI vs. original)
 
