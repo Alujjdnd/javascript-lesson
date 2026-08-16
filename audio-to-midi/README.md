@@ -31,16 +31,26 @@ pitched notes in B♭ minor. Raw model output kept as `recreation_ymt3_raw.mid`,
 first-generation version as `recreation_basicpitch.mid`; `analyze_midi.py`
 scores any MIDI for stray-note artifacts.
 
-## Method (v3)
+## Method (v6 — ensemble-verified pipeline)
 
-1. Decode MP3 → WAV (ffmpeg); tempo/key analysis with librosa
-   (129.2 BPM, B♭ minor via Krumhansl profile).
-2. Transcribe the full mix with **YourMT3+** (YPTF.MoE+Multi noPS checkpoint
-   from the official HF space), CPU inference at fp32.
-3. Control experiment: Demucs (htdemucs) stems transcribed separately with
-   the same model — scored worse, not adopted.
-4. Light cleanup: the model's six-note "Singing Voice" figure reassigned to
-   a synth-lead program; timing left unquantized.
+Six transcription systems across three architecture families feed a
+verification layer (`pipeline/`):
+
+1. **Candidates** (`gen_candidates.py`): YourMT3+ (full mix + htdemucs stems),
+   basic-pitch (full mix + htdemucs stems + htdemucs_ft stems), deterministic
+   pyin bass tracking; four drum systems (YourMT3+ ×2, band-energy ×2).
+2. **Cross-family voting** (`consensus.py`): notes clustered across systems
+   (same pitch, onsets ≤60 ms); support counted per architecture family —
+   same-family variants vote as one (three basic-pitch variants otherwise
+   confirm each other's shared hallucinations).
+3. **Verify-and-fill** (`build_v6.py`): the best single-model transcription
+   (v4) is the base; notes with no cross-family support and weak CQT evidence
+   are pruned (19), cross-family notes it missed with strong evidence are
+   added (33); drums verified against stem onsets and the 2-family drum vote.
+4. **Scoring** (`eval_framework.py`, mir_eval): note-level F1 between systems,
+   bidirectional onset P/R/F, band envelope correlation, tempo-invariant
+   rhythm autocorrelation. Rejected as unstable: note counts, duration stats,
+   grid deviation, standalone chroma.
 
 Earlier versions: v1/v2 used Demucs stems + Spotify basic-pitch with
 band-energy drum classification and grid quantization (see
@@ -59,16 +69,17 @@ kick-and-crash. Preview: `song_extended_preview.mp3`.
 
 ## Validation (rendered MIDI vs. original)
 
-| metric | v1 basic-pitch | v2 cleaned | v3 YourMT3+ | v4 hand-finished |
+| metric (render vs original) | v3 YourMT3+ | v4 hand-finished | v5 pure ensemble | v6 verified |
 |---|---|---|---|---|
+| onset precision | 0.587 | 0.776 | 0.605 | **0.800** |
+| onset recall | 0.936 | 0.809 | 0.979 | **0.851** |
+| onset F1 | 0.721 | 0.792 | 0.748 | **0.825** |
+| rhythm autocorr similarity | 0.996 | 0.996 | 0.982 | **0.998** |
 | off-key notes | 0 | 0 | 0 | **0** |
-| MIDI onset coverage (70 ms) | — | — | 47/47 | **47/47** |
-| chroma similarity | 0.95* | 0.89 | 0.88 | **0.91** |
-| velocity levels | varied | varied | 1 (flat 100) | **70** |
-| tracks | 3 | 3 | 7 | **7** |
 
-\* v1's higher chroma came from 141 phantom octave-ghost notes padding the
-spectrum — not accuracy.
+The pure ensemble (v5) lost to the single best model — consensus works as a
+*verifier*, not a *generator*. v6 = v4 base ± ensemble corrections wins on
+both precision and recall.
 
 A stem-wise YourMT3+ run (Demucs stems transcribed separately) was also
 tested and scored slightly worse than the full-mix pass on both stray-note
