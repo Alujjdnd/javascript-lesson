@@ -46,6 +46,17 @@ Earlier versions: v1/v2 used Demucs stems + Spotify basic-pitch with
 band-energy drum classification and grid quantization (see
 `stems_to_midi.py`, kept for reference).
 
+## Continuation
+
+`song_extended.mid` continues the piece from bar 16 (where the recording cuts
+off mid-bar) with a 10-bar self-sampled coda (`continue_song.py`): the chord
+cycle (A♭ → D♭ → Fm → B♭m → Fm → G♭ → Fm → B♭m → E♭m) is derived from per-bar
+analysis, each new bar borrows phrases from source bars with the same chord
+(velocity-shaped, ±8 ms jitter), and the arc eases down to a sustained B♭ minor
+resolution (~53 s total). Continuation vs source: chroma profile correlation
+0.926, identical tempo, 144/144 notes in key, gently softer dynamics.
+Preview: `song_extended_preview.mp3`.
+
 ## Validation (rendered MIDI vs. original)
 
 | metric | v1 basic-pitch | v2 cleaned | v3 YourMT3+ | v4 hand-finished |
