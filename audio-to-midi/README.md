@@ -21,12 +21,17 @@ Multi-track MIDI transcription of `source.mp3` (28.6 s instrumental).
 
 ## MIDI tracks
 
-1. **Bass** (Fingered Electric Bass, program 33) — 93 notes, G♯1–F3.
-   Bassline moves through A♭–C♯/D♭–E♭–F–B♭ territory, fitting B♭ minor.
-2. **Harmony/Keys** (Lead 2 sawtooth, program 81) — 359 notes, chords and
-   melodic figures from the "other" stem.
+1. **Bass** (Fingered Electric Bass, program 33) — 42 notes. Rhythm is taken
+   from the bass stem's own detected onsets (all 42 covered) and pitch from
+   the basic-pitch transcription, so repeated same-pitch pulses keep their
+   attacks. Moves through A♭–C♯/D♭–E♭–F–B♭ territory, fitting B♭ minor.
+2. **Harmony/Pad** (Warm Pad, program 89) — 106 notes. Strict transcription
+   thresholds plus post-processing: same-pitch note merging, ghost-note
+   removal, 16th-note grid quantization, and a 4-voice polyphony cap.
 3. **Drums** (GM channel 10) — 109 hits classified into kick (36), snare (38),
-   and closed hi-hat (42) by band-energy analysis at each detected onset.
+   and closed hi-hat (42) by band-energy analysis, quantized to the grid.
+
+All pitched notes (148/148) fall inside the B♭ natural minor scale.
 
 ## Method
 
@@ -43,6 +48,7 @@ Multi-track MIDI transcription of `source.mp3` (28.6 s instrumental).
 
 ## Validation (rendered MIDI vs. original)
 
-- Chroma cosine similarity: **0.95 mean** (harmonic content matches closely)
+- Chroma cosine similarity: **0.89 mean** (harmonic content matches closely)
 - Tempo of rendered audio: **129.2 BPM** (identical)
-- 62 % of the original's detected onsets matched within 70 ms
+- **94 %** of the original's detected onsets matched within 70 ms
+- Bass rhythm: **42/42** of the bass stem's onsets have a MIDI note
